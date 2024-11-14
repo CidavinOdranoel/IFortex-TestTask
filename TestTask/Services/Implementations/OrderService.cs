@@ -25,12 +25,41 @@ namespace TestTask.Services.Implementations
                 .Where(x => x.Quantity > 1)
                 .OrderByDescending(x => x.CreatedAt)
                 .First();
+
             return result;
         }
 
-        public Task<List<Order>> GetOrders()
+        /// <summary>
+        /// Return orders from active users, sorted by creation date
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<Order>> GetOrders()
         {
-            throw new NotImplementedException();
+            var activeUsers = _appDbContext.Users
+                .Where(x => x.Status == Enums.UserStatus.Active);
+
+            var result = _appDbContext.Orders
+                .Where(x => x.UserId == activeUsers.First(y => y.Id == x.UserId).Id)
+                .OrderBy(x => x.CreatedAt)
+                .ToList();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Defines if user is active by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private bool IsUserActive(int id) 
+        {
+            if (_appDbContext.Users.FirstOrDefault(x => x.Id == id)?.Status 
+                == Enums.UserStatus.Active)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
