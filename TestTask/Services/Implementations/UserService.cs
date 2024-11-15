@@ -23,6 +23,7 @@ namespace TestTask.Services.Implementations
         {
             var ordersIn2003 = _appDbContext.Orders
                 .Where(x => x.CreatedAt.Year == 2003).ToList();
+            var users = _appDbContext.Users.Where(x => true);
 
 
             Dictionary<int, int> usersTotalPriceIn2003 = new Dictionary<int, int>();
@@ -33,7 +34,6 @@ namespace TestTask.Services.Implementations
                     usersTotalPriceIn2003.Add(order.UserId, 0);
                 }
                 usersTotalPriceIn2003[order.UserId] = order.Price;
-                order.User = null;
             }
             
 
@@ -47,9 +47,34 @@ namespace TestTask.Services.Implementations
             return result;
         }
 
-        public Task<List<User>> GetUsers()
+        /// <summary>
+        /// Get users with paid orders in 2010
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<User>> GetUsers()
         {
-            throw new NotImplementedException();
+            var paidOrdersIn2010 = _appDbContext.Orders
+                .Where(x => x.CreatedAt.Year == 2010)
+                .Where(x => x.Status == Enums.OrderStatus.Paid)
+                .ToList();
+            var users = _appDbContext.Users.ToList();
+
+            HashSet<User> usersWithPaidOrders = new HashSet<User>();
+
+            foreach (var order in paidOrdersIn2010)
+            {
+                usersWithPaidOrders.Add(users.First(x => x.Id == order.UserId));
+            }
+            
+            var result = usersWithPaidOrders.ToList();
+
+            foreach (var e in result)
+            {
+                e.Orders = null;
+            }
+
+            return result;
         }
     }
 }
