@@ -46,20 +46,5 @@ namespace TestTask.Services.Implementations
 
             return result;
         }
-
-        /// <summary>
-        /// Defines if user is active by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        private bool IsUserActive(int id) 
-        {
-            if (_appDbContext.Users.FirstOrDefault(x => x.Id == id)?.Status 
-                == Enums.UserStatus.Active)
-            {
-                return true;
-            }
-            return false;
-        }
     }
 }
